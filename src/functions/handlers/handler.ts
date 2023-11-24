@@ -9,7 +9,8 @@ import {
   ScanCommand,
   PutCommand,
   GetCommand,
-  DeleteCommand
+  DeleteCommand,
+  UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
 
 import schema from './schema';
@@ -37,6 +38,30 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event)
               }
             })
           );
+          if(response.Item.type == 'one-time') {
+            dynamo.send(
+              new DeleteCommand({
+                TableName: tableName,
+                Key: {
+                  id: response.Item.id
+                }
+              })
+            );
+          } else {
+            dynamo.send(
+              new UpdateCommand({
+                TableName: tableName,
+                Key: {
+                  id: response.Item.id
+                },
+                UpdateExpression: "set visit = :numberOfVisit, lastVisit = :currentDate",
+                ExpressionAttributeValues: {
+                  ":numberOfVisit": response.Item.visit + 1,
+                  ":currentDate": new Date().toLocaleString()
+                }
+              })
+            );
+          }
           return formatJSONResponse(null, {
             Location: response.Item.url
           }, 302);
@@ -86,6 +111,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event)
           Item: {
             id: recordId,
             url: event.body.url,
+            type: types[event.body.type],
             visit: 0,
             lastVisit: null
           }
