@@ -1,5 +1,5 @@
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
-import { AttributeValue, DynamoDBClient, GetItemCommand, ListTablesCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, ListTablesCommand } from '@aws-sdk/client-dynamodb';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { tableName } from '@libs/table';
@@ -71,6 +71,12 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event)
             code: error.code
           }, null, error.code);
         }
+    }
+    if(event.resource.includes('/tables')) {
+      const listOfTables = await dynamo.send(new ListTablesCommand({}));
+      return formatJSONResponse({
+        tablesNames: listOfTables.TableNames
+      }, null, 200);
     }
     const result = {};
     for(let item of all.Items) {

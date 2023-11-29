@@ -31,6 +31,13 @@ export default {
     },
     {
       http: {
+        method: 'get',
+        path: '/tables',
+        request: null
+      }
+    },
+    {
+      http: {
         method: 'delete',
         path: '/{id}',
         request: null
