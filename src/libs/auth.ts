@@ -17,17 +17,7 @@ const generatePolicy = (principal: string, effect: string, resource: string): AP
 const authorize = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGatewayAuthorizerResult> => {
     const token = event.authorizationToken;
     const methodArn = event.methodArn;
-    return {
-        principalId: 'user',
-        policyDocument: {
-            Version: new Date().toISOString(),
-            Statement: [{
-                Action: 'execute-api:Invoke',
-                Effect: 'Allow',
-                Resource: methodArn
-            }]
-        }
-    }
+    return generatePolicy('user', 'allowed', methodArn);
 }
 
 export default authorize;

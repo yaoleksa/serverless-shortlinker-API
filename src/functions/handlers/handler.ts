@@ -89,6 +89,13 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event)
     }
     return formatJSONResponse(result, null, 200);
     case 'POST':
+      if(event.resource.includes('/signup')) {
+        return formatJSONResponse({
+          "Status": "Success"
+        }, {
+          "Content-Type": "application/json"
+        }, 201);
+      }
       let recordId = uid.rnd();
       try {
       const existingRecord = all.Items.find(e => e.url == event.body.url);

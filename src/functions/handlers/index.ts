@@ -1,4 +1,5 @@
-import schema from './schema';
+import schema  from './schema';
+import authSchema from './authSchema';
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
@@ -14,6 +15,17 @@ export default {
           },
         },
       },
+    },
+    {
+      http: {
+        method: 'post',
+        path: '/signup',
+        request: {
+          schemas: {
+            'application/json': authSchema,
+          }
+        }
+      }
     },
     {
       http: {
