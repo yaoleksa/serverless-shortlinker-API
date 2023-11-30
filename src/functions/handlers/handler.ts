@@ -2,7 +2,7 @@ import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { DynamoDBClient, ListTablesCommand } from '@aws-sdk/client-dynamodb';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { tableName } from '@libs/table';
+import { tableName, usersTable } from '@libs/table';
 import ShortUniqueId from 'short-unique-id';
 import {
   DynamoDBDocumentClient,
@@ -16,6 +16,7 @@ import {
 import schema from './schema';
 import authSchema from './authSchema';
 import { types, validateUrl, emailValidate, pswdValidate } from './validator';
+import { encrypt } from '@libs/auth';
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -99,18 +100,30 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
           }, 400);
         }
         const passwordValidationResult = pswdValidate(event.body.password);
-        if(passwordValidationResult != 'Success') {
+        if(passwordValidationResult.substring(0, 7) != 'Error: ') {
           return formatJSONResponse({
             message: passwordValidationResult
           }, {
             "Content-Type": "application/json"
           }, 400);
         }
-        return formatJSONResponse({
-          "Status": "Success"
-        }, {
-          "Content-Type": "application/json"
-        }, 201);
+        let encryptedPassword = encrypt(event.body.password);
+        if(encryptedPassword.status) {
+          const result = await dynamo.send(new PutCommand({
+            TableName: usersTable,
+            Item: {
+              email: event.body.email,
+              password: encryptedPassword.message
+            }
+          }));
+          return formatJSONResponse(result, {"Content-Type": "application/json"}, 201);
+        } else {
+          return formatJSONResponse({
+            message: encryptedPassword.message
+          }, {
+            "Content-Type": "application/json"
+          }, 400);
+        }
       }
       let recordId = uid.rnd();
       try {

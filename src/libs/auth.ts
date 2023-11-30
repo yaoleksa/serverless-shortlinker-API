@@ -1,4 +1,25 @@
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from "aws-lambda";
+import bcryptjs from 'bcryptjs';
+
+class Result {
+    message: string;
+    status: boolean;
+    constructor(stat, msg) {
+        this.message = msg,
+        this.status = stat;
+    }
+}
+
+const encrypt = (pswd: string): Result => {
+    return bcryptjs.hash(pswd, 10, (err, hash) => {
+        if(err) {
+            return new Result(false, err.message);
+        }
+        if(hash) {
+            return new Result(true, hash);
+        }
+    });
+}
 
 const generatePolicy = (principal: string, effect: string, resource: string): APIGatewayAuthorizerResult => {
     return {
@@ -20,4 +41,4 @@ const authorize = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGate
     return generatePolicy('user', 'allowed', methodArn);
 }
 
-export default authorize;
+export { authorize, encrypt };
