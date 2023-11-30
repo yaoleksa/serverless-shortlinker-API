@@ -14,13 +14,14 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 
 import schema from './schema';
-import { types, validateUrl } from './validator';
+import authSchema from './authSchema';
+import { types, validateUrl, emailValidate, pswdValidate } from './validator';
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 const uid = new ShortUniqueId({length: 5});
 
-const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
+const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSchema> = async (event) => {
   const all = await dynamo.send(
     new ScanCommand({
       TableName: tableName
@@ -90,6 +91,21 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event)
     return formatJSONResponse(result, null, 200);
     case 'POST':
       if(event.resource.includes('/signup')) {
+        if(!emailValidate(event.body.email)) {
+          return formatJSONResponse({
+            message: 'Invalid email format'
+          }, {
+            "Content-Type": "application/json"
+          }, 400);
+        }
+        const passwordValidationResult = pswdValidate(event.body.password);
+        if(passwordValidationResult != 'Success') {
+          return formatJSONResponse({
+            message: passwordValidationResult
+          }, {
+            "Content-Type": "application/json"
+          }, 400);
+        }
         return formatJSONResponse({
           "Status": "Success"
         }, {
@@ -118,7 +134,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event)
           message: 'Invalid url format'
         }, null, 403);
       }
-      const result = await dynamo.send(
+      await dynamo.send(
         new PutCommand({
           TableName: tableName,
           Item: {

@@ -9,4 +9,27 @@ function validateUrl(url: string): boolean {
     return /^http:\/\/./.test(url) || /^https:\/\/./.test(url);
 }
 
-export { validateUrl, types }
+function emailValidate(email: string): boolean {
+    return /.+@.+\..+/.test(email);
+}
+
+function pswdValidate(password: string): string {
+    if(password.length < 6) {
+        return 'Password must have at least 6 characters';
+    }
+    if(!/\d+/.test(password)) {
+        return 'Password must include at least one number';
+    }
+    if(!/[A-Z]+/.test(password)) {
+        return 'Password must include at least one uppercase letter';
+    }
+    if(!/[a-z]+/.test(password)) {
+        return 'Password must include at least one lowercase letter';
+    }
+    if(!/[\!\@\#\$\%\^\&\*\(\)\_\-\=\+\?\>]+/.test(password)) {
+        return 'Password must include at least one special character';
+    }
+    return 'Success';
+}
+
+export { validateUrl, emailValidate, pswdValidate, types };
