@@ -1,10 +1,8 @@
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from "aws-lambda";
 import bcrypt from 'bcryptjs';
-import { stringify } from "querystring";
 
 const encrypt = (pswd: string): string => {
-    const salt = bcrypt.genSaltSync(10);
-    return JSON.stringify(salt);
+    return bcrypt.hashSync(pswd, bcrypt.genSaltSync(10));
 }
 
 const generatePolicy = (principal: string, effect: string, resource: string): APIGatewayAuthorizerResult => {
