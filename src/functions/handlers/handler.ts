@@ -127,19 +127,29 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
             email: event.body.email
           }
         }));
-        if(signIn(event.body.password, creds.Item.password)) {
-          return formatJSONResponse({
-            message: "You have successfully logged in!"
-          }, {
-            "Content-Type": "application/json"
-          }, 200);
-        } else {
-          return formatJSONResponse({
-            message: 'Invalid credentials'
-          }, {
-            "Content-Type": "application/json"
-          }, 400);
-        }
+        try {
+          if(!creds) {
+            return formatJSONResponse({
+              message: "There is no such user in the database. Sign up firstly"
+            }, {
+              "Content-Type": "application/json"
+            }, 400);
+          }
+          const token = signIn(event.body.email, event.body.password, creds.Item.password);
+          if(token) {
+            return formatJSONResponse({
+              message: token
+            }, {
+              "Content-Type": "application/json"
+            }, 200);
+          } else {
+            return formatJSONResponse({
+              message: 'Invalid credentials'
+            }, {
+              "Content-Type": "application/json"
+            }, 400);
+          }
+        } catch(ex) { return formatJSONResponse({message: ex.message}, {}, 400); }
       }
       let recordId = uid.rnd();
       try {
