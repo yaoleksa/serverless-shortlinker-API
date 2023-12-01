@@ -29,6 +29,17 @@ export default {
     },
     {
       http: {
+        method: 'post',
+        path: '/signin',
+        request: {
+          schemas: {
+            'application/json': authSchema,
+          }
+        }
+      }
+    },
+    {
+      http: {
         method: 'get',
         path: '/',
         request: null

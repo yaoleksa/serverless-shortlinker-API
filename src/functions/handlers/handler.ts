@@ -127,13 +127,18 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
             email: event.body.email
           }
         }));
-        const signInResult = signIn(event.body.password, creds.Item.password);
-        if(signInResult && signInResult.status) {
+        if(signIn(event.body.password, creds.Item.password)) {
           return formatJSONResponse({
             message: "You have successfully logged in!"
           }, {
             "Content-Type": "application/json"
           }, 200);
+        } else {
+          return formatJSONResponse({
+            message: 'Invalid credentials'
+          }, {
+            "Content-Type": "application/json"
+          }, 400);
         }
       }
       let recordId = uid.rnd();

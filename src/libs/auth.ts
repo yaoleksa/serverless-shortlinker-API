@@ -1,26 +1,12 @@
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from "aws-lambda";
 import bcrypt from 'bcryptjs';
 
-class LoginResult {
-    status: boolean;
-    message: string;
-    constructor(stat, msg) {
-        this.status = stat;
-        this.message = msg;
-    }
-}
-
 const encrypt = (pswd: string): string => {
     return bcrypt.hashSync(pswd, bcrypt.genSaltSync(10));
 }
 
-const signIn = (pswd: string, hash: string): LoginResult => {
-    return bcrypt.compare(pswd, hash, (err, res) => {
-        if(err) {
-            return new LoginResult(false, err.message);
-        }
-        return new LoginResult(res, 'success');
-    });
+const signIn = (pswd: string, hash: string): boolean => {
+    return bcrypt.compareSync(pswd, hash);
 }
 
 const generatePolicy = (principal: string, effect: string, resource: string): APIGatewayAuthorizerResult => {

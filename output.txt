@@ -2,9 +2,10 @@
 endpoints:
   POST - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/
   POST - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/signup
+  POST - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/signin
   GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/
   GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/{id}
   GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/tables
   DELETE - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/{id}
 functions:
-  handler: shortlinker-dev-handler (557 kB)
+  handler: shortlinker-dev-handler (596 kB)
