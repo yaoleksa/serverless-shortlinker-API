@@ -1,5 +1,5 @@
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from "aws-lambda";
-import bcryptjs from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 class Result {
     message: string;
@@ -11,7 +11,7 @@ class Result {
 }
 
 const encrypt = (pswd: string): Result => {
-    return bcryptjs.hash(pswd, 10, (err, hash) => {
+    return bcrypt.hash(pswd, 10, (err, hash) => {
         if(err) {
             return new Result(false, err.message);
         }
