@@ -16,7 +16,7 @@ import {
 import schema from './schema';
 import authSchema from './authSchema';
 import { types, validateUrl, emailValidate, pswdValidate } from './validator';
-import { encrypt } from '@libs/auth';
+import { encrypt, signIn } from '@libs/auth';
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -119,6 +119,22 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
           }
         }));
         return formatJSONResponse(DBresponse, { "Content-Type": "application/json" }, 201)
+      }
+      if(event.resource.includes('/signin')) {
+        const creds = await dynamo.send(new GetCommand({
+          TableName: usersTable,
+          Key: {
+            email: event.body.email
+          }
+        }));
+        const signInResult = signIn(event.body.password, creds.Item.password);
+        if(signInResult && signInResult.status) {
+          return formatJSONResponse({
+            message: "You have successfully logged in!"
+          }, {
+            "Content-Type": "application/json"
+          }, 200);
+        }
       }
       let recordId = uid.rnd();
       try {

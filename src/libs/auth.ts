@@ -1,8 +1,26 @@
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from "aws-lambda";
 import bcrypt from 'bcryptjs';
 
+class LoginResult {
+    status: boolean;
+    message: string;
+    constructor(stat, msg) {
+        this.status = stat;
+        this.message = msg;
+    }
+}
+
 const encrypt = (pswd: string): string => {
     return bcrypt.hashSync(pswd, bcrypt.genSaltSync(10));
+}
+
+const signIn = (pswd: string, hash: string): LoginResult => {
+    return bcrypt.compare(pswd, hash, (err, res) => {
+        if(err) {
+            return new LoginResult(false, err.message);
+        }
+        return new LoginResult(res, 'success');
+    });
 }
 
 const generatePolicy = (principal: string, effect: string, resource: string): APIGatewayAuthorizerResult => {
@@ -25,4 +43,4 @@ const authorize = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGate
     return generatePolicy('user', 'allowed', methodArn);
 }
 
-export { authorize, encrypt };
+export { authorize, encrypt, signIn };
