@@ -109,9 +109,16 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
         }
         let encryptedPassword = encrypt(event.body.password);
         if(!encryptedPassword) {
-          return formatJSONResponse({"error": "probably async"}, { "Content-Type": "application/json" }, 400);
+          return formatJSONResponse({"error": "can't encrypt password"}, { "Content-Type": "application/json" }, 500);
         }
-        return formatJSONResponse({ message: encryptedPassword }, { "Content-Type": "application/json" }, 200);
+        const DBresponse = await dynamo.send(new PutCommand({
+          TableName: usersTable,
+          Item: {
+            email: event.body.email,
+            password: encryptedPassword
+          }
+        }));
+        return formatJSONResponse(DBresponse, { "Content-Type": "application/json" }, 201)
       }
       let recordId = uid.rnd();
       try {
