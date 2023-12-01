@@ -100,7 +100,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
           }, 400);
         }
         const passwordValidationResult = pswdValidate(event.body.password);
-        if(passwordValidationResult.substring(0, 7) != 'Error: ') {
+        if(passwordValidationResult != 'Success') {
           return formatJSONResponse({
             message: passwordValidationResult
           }, {
@@ -108,22 +108,10 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
           }, 400);
         }
         let encryptedPassword = encrypt(event.body.password);
-        if(encryptedPassword.status) {
-          const result = await dynamo.send(new PutCommand({
-            TableName: usersTable,
-            Item: {
-              email: event.body.email,
-              password: encryptedPassword.message
-            }
-          }));
-          return formatJSONResponse(result, {"Content-Type": "application/json"}, 201);
-        } else {
-          return formatJSONResponse({
-            message: encryptedPassword.message
-          }, {
-            "Content-Type": "application/json"
-          }, 400);
+        if(!encryptedPassword) {
+          return formatJSONResponse({"error": "probably async"}, { "Content-Type": "application/json" }, 400);
         }
+        return formatJSONResponse({ message: encryptedPassword }, { "Content-Type": "application/json" }, 200);
       }
       let recordId = uid.rnd();
       try {
