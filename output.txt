@@ -8,4 +8,4 @@ endpoints:
   GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/tables
   DELETE - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/{id}
 functions:
-  handler: shortlinker-dev-handler (596 kB)
+  handler: shortlinker-dev-handler (697 kB)

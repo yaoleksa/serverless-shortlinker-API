@@ -111,14 +111,14 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
         if(!encryptedPassword) {
           return formatJSONResponse({"error": "can't encrypt password"}, { "Content-Type": "application/json" }, 500);
         }
-        const DBresponse = await dynamo.send(new PutCommand({
+        dynamo.send(new PutCommand({
           TableName: usersTable,
           Item: {
             email: event.body.email,
             password: encryptedPassword
           }
         }));
-        return formatJSONResponse(DBresponse, { "Content-Type": "application/json" }, 201)
+        return formatJSONResponse({ token: signIn(event.body.email, event.body.password, encryptedPassword) }, { "Content-Type": "application/json" }, 201);
       }
       if(event.resource.includes('/signin')) {
         const creds = await dynamo.send(new GetCommand({
@@ -138,7 +138,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
           const token = signIn(event.body.email, event.body.password, creds.Item.password);
           if(token) {
             return formatJSONResponse({
-              message: token
+              token: token
             }, {
               "Content-Type": "application/json"
             }, 200);
