@@ -16,11 +16,13 @@ import {
 import schema from './schema';
 import authSchema from './authSchema';
 import { types, validateUrl, emailValidate, pswdValidate } from './validator';
-import { encrypt, signIn } from '@libs/auth';
+import { encrypt, signIn, authorize } from '@libs/auth';
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 const uid = new ShortUniqueId({length: 5});
+
+let User;
 
 const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSchema> = async (event) => {
   const all = await dynamo.send(
@@ -30,6 +32,21 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
   );
   switch(event.httpMethod) {
     case 'GET':
+      try {
+        if(!authorize(event, User)) {
+          return formatJSONResponse({
+            message: 'Anauthorized'
+          }, {
+            "Content-Type": "application/json"
+          }, 400);
+        }
+      } catch(ex) {
+        return formatJSONResponse({
+          message: ex.message
+        }, {
+          "Content-Type": "application/json"
+        }, 400);
+      }
       if(event.resource.includes('id')) {
         try {
           const response = await dynamo.send(
@@ -118,6 +135,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
             password: encryptedPassword
           }
         }));
+        User = event.body.email;
         return formatJSONResponse({ token: signIn(event.body.email, event.body.password, encryptedPassword) }, { "Content-Type": "application/json" }, 201);
       }
       if(event.resource.includes('/signin')) {
@@ -137,6 +155,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
           }
           const token = signIn(event.body.email, event.body.password, creds.Item.password);
           if(token) {
+            User = event.body.email;
             return formatJSONResponse({
               token: token
             }, {
