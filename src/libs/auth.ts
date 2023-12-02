@@ -1,3 +1,4 @@
+import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from 'aws-lambda';
 import bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 import * as fs from 'fs';
@@ -19,9 +20,22 @@ const signIn = (mail: string, pswd: string, hash: string): string => {
     }
 }
 
-const authorize = (event, user: string): boolean => {
-    return fs.readdirSync('../../tmp').includes(`${user}.env`) && 
-    fs.readFileSync(`../../tmp/${user}.env`).toString().split[1] == event.headers.authorize.match(/\s.+$/g)[0].trim();
+const authorize = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGatewayAuthorizerResult> => {
+    const token = event.authorizationToken;
+    if(token)
+    return {
+        principalId: 'user',
+        policyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+                {
+                    Action: 'execute-api:Invoke',
+                    Effect: 'Deny',
+                    Resource: event.methodArn,
+                },
+            ],
+        },
+    };
 };
 
 export { authorize, encrypt, signIn };

@@ -1,4 +1,4 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
+import type { ValidatedEventAPIGatewayProxyEvent, ValidatedEventAPIGatewayAuthorizerEvent } from '@libs/api-gateway';
 import { DynamoDBClient, ListTablesCommand } from '@aws-sdk/client-dynamodb';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
@@ -22,9 +22,10 @@ const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 const uid = new ShortUniqueId({length: 5});
 
-let User;
+//let User; // THIS IS A PROBLEM
 
-const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSchema> = async (event) => {
+const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSchema> | 
+ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = async (event) => {
   const all = await dynamo.send(
     new ScanCommand({
       TableName: tableName
@@ -32,8 +33,9 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
   );
   switch(event.httpMethod) {
     case 'GET':
+      authorize(event);
       try {
-        if(!authorize(event, User)) {
+        if(!authorize(null)) {
           return formatJSONResponse({
             message: 'Anauthorized'
           }, {
@@ -135,7 +137,6 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
             password: encryptedPassword
           }
         }));
-        User = event.body.email;
         return formatJSONResponse({ token: signIn(event.body.email, event.body.password, encryptedPassword) }, { "Content-Type": "application/json" }, 201);
       }
       if(event.resource.includes('/signin')) {
@@ -155,7 +156,6 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSch
           }
           const token = signIn(event.body.email, event.body.password, creds.Item.password);
           if(token) {
-            User = event.body.email;
             return formatJSONResponse({
               token: token
             }, {
