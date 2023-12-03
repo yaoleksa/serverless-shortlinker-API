@@ -20,22 +20,26 @@ const signIn = (mail: string, pswd: string, hash: string): string => {
     }
 }
 
-const authorize = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGatewayAuthorizerResult> => {
-    const token = event.authorizationToken;
-    if(token)
+const generatePolicy = (principal: string, effect: string, arn: string): APIGatewayAuthorizerResult => {
     return {
-        principalId: 'user',
+        principalId: principal,
         policyDocument: {
             Version: '2012-10-17',
             Statement: [
                 {
                     Action: 'execute-api:Invoke',
-                    Effect: 'Deny',
-                    Resource: event.methodArn,
-                },
-            ],
-        },
+                    Effect: effect,
+                    Resource: arn
+                }
+            ]
+        }
     };
+}
+
+const authorize = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGatewayAuthorizerResult> => {
+    const token = event.authorizationToken;
+    if(token)
+    return generatePolicy('user', 'Allow', event.methodArn);
 };
 
 export { authorize, encrypt, signIn };

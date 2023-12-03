@@ -33,20 +33,11 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
   );
   switch(event.httpMethod) {
     case 'GET':
-      authorize(event);
-      try {
-        if(!authorize(null)) {
-          return formatJSONResponse({
-            message: 'Anauthorized'
-          }, {
-            "Content-Type": "application/json"
-          }, 400);
-        }
-      } catch(ex) {
-        return formatJSONResponse({
-          message: ex.message
-        }, {
-          "Content-Type": "application/json"
+      if(!event.authorizationToken) {
+        return formatJSONResponse({ 
+          message: 'Anauthorized' 
+        }, { 
+          "Content-Type": "application/json" 
         }, 400);
       }
       if(event.resource.includes('id')) {
