@@ -16,7 +16,7 @@ import {
 import schema from './schema';
 import authSchema from './authSchema';
 import { types, validateUrl, emailValidate, pswdValidate } from './validator';
-import { encrypt, signIn, authorize } from '@libs/auth';
+import { encrypt, signIn } from '@libs/auth';
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -33,13 +33,6 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
   );
   switch(event.httpMethod) {
     case 'GET':
-      if(!event.authorizationToken) {
-        return formatJSONResponse({ 
-          message: 'Anauthorized' 
-        }, { 
-          "Content-Type": "application/json" 
-        }, 400);
-      }
       if(event.resource.includes('id')) {
         try {
           const response = await dynamo.send(

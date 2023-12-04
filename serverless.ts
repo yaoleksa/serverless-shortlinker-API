@@ -1,5 +1,4 @@
 import type { AWS } from '@serverless/typescript';
-
 import handler from '@functions/handlers';
 
 const serverlessConfiguration: AWS = {
@@ -17,6 +16,17 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
+    httpApi: {
+      authorizers: {
+        authHandler: {
+          type: 'jwt',
+          name: 'authorizaer',
+          identitySource: '$request.header.Authorization',
+          issuerUrl: 'https://cognito-idp.${region}.amazonaws.com/${cognitoPoolId}',
+          audience: {}
+        }
+      }
+    }
   },
   // import the function via paths
   functions: { handler },
