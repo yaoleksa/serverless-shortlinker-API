@@ -22,8 +22,8 @@ const serverlessConfiguration: AWS = {
           type: 'jwt',
           name: 'authorizaer',
           identitySource: '$request.header.Authorization',
-          issuerUrl: 'https://cognito-idp.${region}.amazonaws.com/${cognitoPoolId}',
-          audience: {}
+          issuerUrl: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_p4wTGn2fj',
+          audience: 'audience'
         }
       }
     }
