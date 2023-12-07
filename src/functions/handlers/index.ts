@@ -60,12 +60,10 @@ export default {
       }
     },
     {
-      httpApi: {
+      http: {
         method: 'get',
         path: '/tables',
-        authorizer: {
-          name: 'authHandler'
-        }
+        request: null
       }
     },
     {
