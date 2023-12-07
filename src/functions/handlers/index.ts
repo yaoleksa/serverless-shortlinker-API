@@ -19,18 +19,7 @@ export default {
     {
       http: {
         method: 'post',
-        path: '/signup',
-        request: {
-          schemas: {
-            'application/json': authSchema,
-          }
-        }
-      }
-    },
-    {
-      http: {
-        method: 'post',
-        path: '/signin',
+        path: '/auth',
         request: {
           schemas: {
             'application/json': authSchema,
@@ -56,13 +45,6 @@ export default {
       http: {
         method: 'get',
         path: '/signin',
-        request: null
-      }
-    },
-    {
-      http: {
-        method: 'get',
-        path: '/tables',
         request: null
       }
     },

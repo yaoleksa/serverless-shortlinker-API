@@ -1,8 +1,8 @@
 import type { ValidatedEventAPIGatewayProxyEvent, ValidatedEventAPIGatewayAuthorizerEvent } from '@libs/api-gateway';
-import { DynamoDBClient, ListTablesCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { tableName, usersTable } from '@libs/table';
+import { tableName } from '@libs/table';
 import ShortUniqueId from 'short-unique-id';
 import {
   DynamoDBDocumentClient,
@@ -12,11 +12,10 @@ import {
   DeleteCommand,
   UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
-
+import axios from 'axios';
 import schema from './schema';
 import authSchema from './authSchema';
-import { types, validateUrl, emailValidate, pswdValidate } from './validator';
-import { encrypt, signIn } from '@libs/auth';
+import { types, validateUrl } from './validator';
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -77,12 +76,6 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
           }, null, error.code);
         }
     }
-    if(event.resource.includes('/tables')) {
-      const listOfTables = await dynamo.send(new ListTablesCommand({}));
-      return formatJSONResponse({
-        tablesNames: listOfTables.TableNames
-      }, null, 200);
-    }
     if(event.resource.includes('signin')) {
       try {
         return formatJSONResponse({
@@ -103,65 +96,23 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
     }
     return formatJSONResponse(result, null, 200);
     case 'POST':
-      if(event.resource.includes('/signup')) {
-        if(!emailValidate(event.body.email)) {
-          return formatJSONResponse({
-            message: 'Invalid email format'
-          }, {
-            "Content-Type": "application/json"
-          }, 400);
-        }
-        const passwordValidationResult = pswdValidate(event.body.password);
-        if(passwordValidationResult != 'Success') {
-          return formatJSONResponse({
-            message: passwordValidationResult
-          }, {
-            "Content-Type": "application/json"
-          }, 400);
-        }
-        let encryptedPassword = encrypt(event.body.password);
-        if(!encryptedPassword) {
-          return formatJSONResponse({"error": "can't encrypt password"}, { "Content-Type": "application/json" }, 500);
-        }
-        dynamo.send(new PutCommand({
-          TableName: usersTable,
-          Item: {
-            email: event.body.email,
-            password: encryptedPassword
+      if(event.resource.includes('auth')) {
+        const tokens = await axios.post('https://shortlinker.auth.us-east-1.amazoncognito.com/oauth2/token', {
+          "grant_type": "authorization_code",
+          "client_id": "432f7qk145rf0ha5u5605obpqf",
+          "code": event.body.code,
+          "redirect_uri": "https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/signin/"
+        }, {
+          headers: {
+            "Authorization": 'Basic NDMyZjdxazE0NXJmMGhhNXU1NjA1b2JwcWY6MTloZjE3OGU5djZnbnBqZmVna21kcjI5cmIycmM3MnEyZjRkMWM4dmViODZlYmpxbGwx',
+            "Content-Type": "application/x-www-form-urlencoded"
           }
-        }));
-        return formatJSONResponse({ token: signIn(event.body.email, event.body.password, encryptedPassword) }, { "Content-Type": "application/json" }, 201);
-      }
-      if(event.resource.includes('/signin')) {
-        const creds = await dynamo.send(new GetCommand({
-          TableName: usersTable,
-          Key: {
-            email: event.body.email
-          }
-        }));
-        try {
-          if(!creds) {
-            return formatJSONResponse({
-              message: "There is no such user in the database. Sign up firstly"
-            }, {
-              "Content-Type": "application/json"
-            }, 400);
-          }
-          const token = signIn(event.body.email, event.body.password, creds.Item.password);
-          if(token) {
-            return formatJSONResponse({
-              token: token
-            }, {
-              "Content-Type": "application/json"
-            }, 200);
-          } else {
-            return formatJSONResponse({
-              message: 'Invalid credentials'
-            }, {
-              "Content-Type": "application/json"
-            }, 400);
-          }
-        } catch(ex) { return formatJSONResponse({message: ex.message}, {}, 400); }
+        });
+        return formatJSONResponse({
+          token: tokens.data.id_token
+        }, {
+          "Content-Type": "application/json"
+        }, 200);
       }
       let recordId = uid.rnd();
       try {
