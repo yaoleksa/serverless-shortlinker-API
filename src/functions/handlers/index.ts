@@ -53,6 +53,13 @@ export default {
       }
     },
     {
+      http: {
+        method: 'get',
+        path: '/signin',
+        request: null
+      }
+    },
+    {
       httpApi: {
         method: 'get',
         path: '/tables',

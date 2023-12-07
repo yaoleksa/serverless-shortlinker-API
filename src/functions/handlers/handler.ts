@@ -83,6 +83,11 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
         tablesNames: listOfTables.TableNames
       }, null, 200);
     }
+    if(event.resource.includes('signin')) {
+      try {
+        return formatJSONResponse(event , {}, 200);
+      } catch(err) {}
+    }
     const result = {};
     for(let item of all.Items) {
       result[item.id] = {
