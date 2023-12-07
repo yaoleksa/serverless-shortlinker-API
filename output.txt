@@ -6,7 +6,7 @@ endpoints:
   GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/
   GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/{id}
   GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/signin
+  GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/tables
   DELETE - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/{id}
-  GET - https://x39u9mt8ja.execute-api.us-east-1.amazonaws.com/tables
 functions:
   handler: shortlinker-dev-handler (688 kB)
