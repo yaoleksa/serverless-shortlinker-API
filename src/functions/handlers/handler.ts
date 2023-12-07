@@ -85,7 +85,11 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
     }
     if(event.resource.includes('signin')) {
       try {
-        return formatJSONResponse(event , {}, 200);
+        return formatJSONResponse({
+          code: event.queryStringParameters ? event.queryStringParameters.code : null
+        } , {
+          "Content-Type": "application/json"
+        }, 200);
       } catch(err) {}
     }
     const result = {};

@@ -22,7 +22,7 @@ const serverlessConfiguration: AWS = {
           type: 'jwt',
           name: 'authorizaer',
           identitySource: '$request.header.Authorization',
-          issuerUrl: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_2jhSvsDn6',
+          issuerUrl: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_2GLgjGQx2',
           audience: 'audience'
         }
       }
