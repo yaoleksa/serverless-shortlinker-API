@@ -13,4 +13,4 @@ So, if you've done everything properly, now there is a **token**. This token you
 - GET - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/signin
 - DELETE - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/{id}
 
-**Token** you have to put in request header as a **Authorization** property in the following format: Bearer *your_token*
+The **token** you have to put in the request header as an **Authorization** property in the following format: Bearer *your_token*
