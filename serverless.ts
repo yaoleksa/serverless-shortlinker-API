@@ -16,6 +16,16 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
+    httpApi: {
+      authorizers: {
+        authHandler: {
+          type: "jwt",
+          identitySource: '$request.header.Authorization',
+          issuerUrl: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_2GLgjGQx2',
+          audience: '*'
+        }
+      }
+    }
   },
   // import the function via paths
   functions: { handler },
