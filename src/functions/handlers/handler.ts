@@ -22,15 +22,8 @@ const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 const uid = new ShortUniqueId({length: 5});
 
-//let User; // THIS IS A PROBLEM
-
 const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema | typeof authSchema> | 
 ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = async (event) => {
-  const all = await dynamo.send(
-    new ScanCommand({
-      TableName: tableName
-    })
-  );
   switch(event.httpMethod) {
     case 'GET':
       if(event.resource.includes('id')) {
@@ -112,11 +105,15 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
         }, 200);
       } catch(err) {}
     }
+    const all = await dynamo.send(new ScanCommand({
+      TableName: tableName,
+      FilterExpression: 'email = :f',
+      ExpressionAttributeValues: {
+        ":f": {S: event.requestContext.authorizer.claims.email}
+      }
+    }));
     const result = {};
     for(let item of all.Items) {
-      if(item.email != event.requestContext.authorizer.claims.email) {
-        continue;
-      }
       result[item.id] = {
         url: item.url,
         type: item.type,
