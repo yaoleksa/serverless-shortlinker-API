@@ -87,6 +87,9 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
     }
     const result = {};
     for(let item of all.Items) {
+      if(item.email != event.requestContext.authorizer.claims.email) {
+        continue;
+      }
       result[item.id] = {
         url: item.url,
         type: item.type,
@@ -94,7 +97,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
         lastVisit: item.lastVisit
       };
     }
-    return formatJSONResponse(result, null, 200);
+    return formatJSONResponse({result: result, event: event.requestContext.authorizer.claims.email}, null, 200);
     case 'POST':
       if(event.resource.includes('auth')) {
         const tokens = await axios.post('https://shortlinker.auth.us-east-1.amazoncognito.com/oauth2/token', {
@@ -144,7 +147,8 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
             url: event.body.url,
             type: types[event.body.type],
             visit: 0,
-            lastVisit: null
+            lastVisit: null,
+            email: event.requestContext.authorizer.claims.email
           }
         })
       );
