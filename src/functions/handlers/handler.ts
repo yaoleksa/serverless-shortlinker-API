@@ -109,7 +109,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
       TableName: tableName,
       FilterExpression: 'email = :f',
       ExpressionAttributeValues: {
-        ":f": {S: event.requestContext.authorizer.claims.email}
+        ':f': event.requestContext.authorizer.claims.email
       }
     }));
     const result = {};
@@ -143,42 +143,49 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
       }
       let recordId = uid.rnd();
       try {
-      const existingRecord = all.Items.find(e => e.url == event.body.url);
-      const contextPath = event.requestContext.path.match(/.$/)[0] == '/' ? event.requestContext.path : event.requestContext.path + '/';
-      if(existingRecord) {
-        return formatJSONResponse({
-          message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + existingRecord.id
-        }, null, 200);
-      }
-      while(all.Items.find(e => e.id == recordId)) {
-        recordId = uid.rnd();
-      }
-      if(!types[event.body.type]) {
-        return formatJSONResponse({ 
-          message: 'Invalid link type' 
-        }, null, 403);
-      }
-      if(!validateUrl(event.body.url)) {
-        return formatJSONResponse({
-          message: 'Invalid url format'
-        }, null, 403);
-      }
-      await dynamo.send(
-        new PutCommand({
+        const all = await dynamo.send(new ScanCommand({
           TableName: tableName,
-          Item: {
-            id: recordId,
-            url: event.body.url,
-            type: types[event.body.type],
-            visit: 0,
-            lastVisit: null,
-            email: event.requestContext.authorizer.claims.email
+          FilterExpression: 'email = :f',
+          ExpressionAttributeValues: {
+            ":f": event.requestContext.authorizer.claims.email
           }
-        })
-      );
-      return formatJSONResponse({
-        message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId
-      }, null, 201);
+        }));
+        const existingRecord = all.Items.find(e => e.url == event.body.url);
+        const contextPath = event.requestContext.path.match(/.$/)[0] == '/' ? event.requestContext.path : event.requestContext.path + '/';
+        if(existingRecord) {
+          return formatJSONResponse({
+            message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + existingRecord.id
+          }, null, 200);
+        }
+        while(all.Items.find(e => e.id == recordId)) {
+          recordId = uid.rnd();
+        }
+        if(!types[event.body.type]) {
+          return formatJSONResponse({ 
+            message: 'Invalid link type' 
+          }, null, 403);
+        }
+        if(!validateUrl(event.body.url)) {
+          return formatJSONResponse({
+            message: 'Invalid url format'
+          }, null, 403);
+        }
+        await dynamo.send(
+          new PutCommand({
+            TableName: tableName,
+            Item: {
+              id: recordId,
+              url: event.body.url,
+              type: types[event.body.type],
+              visit: 0,
+              lastVisit: null,
+              email: event.requestContext.authorizer.claims.email
+            }
+          })
+        );
+        return formatJSONResponse({
+          message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId
+        }, null, 201);
     } catch(error) {
       return formatJSONResponse({
         message: error.message
