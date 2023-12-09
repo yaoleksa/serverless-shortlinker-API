@@ -12,6 +12,7 @@ import {
   DeleteCommand,
   UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import axios from 'axios';
 import schema from './schema';
 import authSchema from './authSchema';
@@ -42,6 +43,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               }
             })
           );
+          const eventClient = new EventBridgeClient({});
           if(response.Item.type == 'one-time') {
             dynamo.send(
               new DeleteCommand({
@@ -66,6 +68,31 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               })
             );
           }
+          // if(response.Item.type == 'one-day') {
+          //   eventClient.send(new PutEventsCommand({
+          //     Entries: [{
+          //       Detail: JSON.stringify({message: 'After one day expires'}),
+          //       DetailType: null,
+          //       Source: null
+          //     }]
+          //   }));
+          // } else if(response.Item.type == 'three-days') {
+          //   eventClient.send(new PutEventsCommand({
+          //     Entries: [{
+          //       Detail: JSON.stringify({message: 'After three days expires'}),
+          //       DetailType: null,
+          //       Source: null
+          //     }]
+          //   }));
+          // } else {
+          //   eventClient.send(new PutEventsCommand({
+          //     Entries: [{
+          //       Detail: JSON.stringify({msg: 'expires after one week'}),
+          //       DetailType: null,
+          //       Source: null
+          //     }]
+          //   }));
+          // }
           return formatJSONResponse(null, {
             Location: response.Item.url
           }, 302);
