@@ -97,7 +97,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
         lastVisit: item.lastVisit
       };
     }
-    return formatJSONResponse({result: result, event: event.requestContext.authorizer.claims.email}, null, 200);
+    return formatJSONResponse(result, null, 200);
     case 'POST':
       if(event.resource.includes('auth')) {
         const tokens = await axios.post('https://shortlinker.auth.us-east-1.amazoncognito.com/oauth2/token', {
