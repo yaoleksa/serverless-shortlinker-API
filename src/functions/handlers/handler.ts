@@ -143,7 +143,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
       }
       let recordId = uid.rnd();
       try {
-        const all = await dynamo.send(new ScanCommand({
+        let all = await dynamo.send(new ScanCommand({
           TableName: tableName,
           FilterExpression: 'email = :f',
           ExpressionAttributeValues: {
@@ -157,6 +157,9 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
             message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + existingRecord.id
           }, null, 200);
         }
+        all = await dynamo.send(new ScanCommand({
+          TableName: tableName
+        }));
         while(all.Items.find(e => e.id == recordId)) {
           recordId = uid.rnd();
         }
