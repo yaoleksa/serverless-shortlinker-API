@@ -110,18 +110,21 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
       FilterExpression: 'email = :f',
       ExpressionAttributeValues: {
         ':f': event.requestContext.authorizer.claims.email
+      },
+      ProjectionExpression: '#valid_id, #valid_url, #valid_type, #valid_visit, #valid_lastVisit',
+      ExpressionAttributeNames: {
+        "#valid_url": "url",
+        "#valid_id": "id",
+        "#valid_type": "type",
+        "#valid_visit": "visit",
+        "#valid_lastVisit": "lastVisit"
       }
     }));
-    const result = {};
-    for(let item of all.Items) {
-      result[item.id] = {
-        url: item.url,
-        type: item.type,
-        numderOfVisit: item.visit,
-        lastVisit: item.lastVisit
-      };
-    }
-    return formatJSONResponse(result, null, 200);
+    return formatJSONResponse({
+      Items: all.Items ? all.Items : "An error has occurred while retrieving data from the database"
+    }, {
+      "Content-Type": "application/json"
+    }, 200);
     case 'POST':
       if(event.resource.includes('auth')) {
         const tokens = await axios.post('https://shortlinker.auth.us-east-1.amazoncognito.com/oauth2/token', {
