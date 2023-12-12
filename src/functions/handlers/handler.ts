@@ -165,7 +165,19 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
         );
         if(event.body.type != '0') {
           const eventClient = new EventBridgeClient({});
-          // implement schedule logic here
+          // YOU NEED TO INVESTIGATE AN EVENTBRIDGE AND CONSIDER PRECISELY WHAT ARE YOU GOING TO DO
+          eventClient.send(new PutEventsCommand({
+            Entries: [
+              {
+                Source: "aws.dynamodb",
+                DetailType: "AWS API Call via CloudTrail",
+                Detail: JSON.stringify({
+                  "eventSource": ["dynamodb.amazonaws.com"],
+                  "eventName": ["DELETE"]
+                })
+              }
+            ]
+          }));
         }
         return formatJSONResponse({
           message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId
