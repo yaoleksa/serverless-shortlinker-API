@@ -163,24 +163,25 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
             }
           })
         );
+        let scheduleEvent = null;
         if(event.body.type != '0') {
           const eventClient = new EventBridgeClient({});
           // YOU NEED TO INVESTIGATE AN EVENTBRIDGE AND CONSIDER PRECISELY WHAT ARE YOU GOING TO DO
-          eventClient.send(new PutEventsCommand({
+          scheduleEvent = eventClient.send(new PutEventsCommand({
             Entries: [
               {
-                Source: "aws.dynamodb",
-                DetailType: "AWS API Call via CloudTrail",
+                Source: "aws.apigateway",
+                DetailType: "APIGateway CRL Ingestion",
                 Detail: JSON.stringify({
-                  "eventSource": ["dynamodb.amazonaws.com"],
-                  "eventName": ["DELETE"]
+                  "state": ["failed", "success"]
                 })
               }
             ]
           }));
         }
         return formatJSONResponse({
-          message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId
+          message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId,
+          schedule: scheduleEvent
         }, null, 201);
     } catch(error) {
       return formatJSONResponse({
