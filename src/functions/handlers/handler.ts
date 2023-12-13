@@ -12,7 +12,6 @@ import {
   DeleteCommand,
   UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
-import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import axios from 'axios';
 import schema from './schema';
 import authSchema from './authSchema';
@@ -150,38 +149,39 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
             message: 'Invalid url format'
           }, null, 403);
         }
-        await dynamo.send(
-          new PutCommand({
-            TableName: tableName,
-            Item: {
-              id: recordId,
-              url: event.body.url,
-              type: types[event.body.type],
-              visit: 0,
-              lastVisit: null,
-              email: event.requestContext.authorizer.claims.email
-            }
-          })
-        );
-        let scheduleEvent = null;
-        if(event.body.type != '0') {
-          const eventClient = new EventBridgeClient({});
-          // YOU NEED TO INVESTIGATE AN EVENTBRIDGE AND CONSIDER PRECISELY WHAT ARE YOU GOING TO DO
-          scheduleEvent = eventClient.send(new PutEventsCommand({
-            Entries: [
-              {
-                Source: "aws.apigateway",
-                DetailType: "APIGateway CRL Ingestion",
-                Detail: JSON.stringify({
-                  "state": ["failed", "success"]
-                })
+        if(event.body.type == '0') {
+          await dynamo.send(
+            new PutCommand({
+              TableName: tableName,
+              Item: {
+                id: recordId,
+                url: event.body.url,
+                type: types[event.body.type],
+                visit: 0,
+                lastVisit: null,
+                email: event.requestContext.authorizer.claims.email,
+                expirationDate: null
               }
-            ]
-          }));
+            })
+          );
+        } else if(event.body.type != '0') {
+          await dynamo.send(
+            new PutCommand({
+              TableName: tableName,
+              Item: {
+                id: recordId,
+                url: event.body.url,
+                type: types[event.body.type],
+                visit: 0,
+                lastVisit: null,
+                email: event.requestContext.authorizer.claims.email,
+                expirationDate: Math.floor((new Date().getTime() + 5 * 60 * 1000)/1000)
+              }
+            })
+          );
         }
         return formatJSONResponse({
           message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId,
-          schedule: scheduleEvent
         }, null, 201);
     } catch(error) {
       return formatJSONResponse({
