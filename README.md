@@ -13,9 +13,26 @@ So, if you've done everything properly, now there is a **token**. This token you
 The **token** you have to put in the request header as an **Authorization** property in the following format: Bearer *your_token*
 
 ## Proper request body and header
-When you post a new url item to the database you should construct the proper body and header of the request. As mentioned above it's critically important to add headers' Authorization in the following format:
+When you POST a new url item to the database you should construct the proper body and header of the request. As mentioned above it's critically important to add headers' Authorization in the following format:
 ***
 <pre>{
     Authorization: Bearer YOUR_TOKEN RETRIEVED AT THE PREVIOUS STEP
+}</pre>
+***
+The Body of a POST request should have the following format:
+***
+<pre>{
+    "url":"URL IN THE VALID FORMAT",
+    "type":"ONE OF THE ALLOWED TYPES"
+}</pre>
+***
+***
+[!WARNING]
+There is a url validator, url must start from `http://` or `https://` prefix and has at leaest one character
+***
+The response will look something like this:
+***
+<pre>{
+  "message": "https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/mkm5o"
 }</pre>
 ***
