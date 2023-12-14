@@ -33,6 +33,9 @@ The Body of a POST request should have the following format:
 > :warning: **There is a URL validator, URL must start from `http://` or `https://` prefix and have at least one character**
 
 URL type is a text which represents the type number. There are four URL types:
+<ol start="0">
+  <li>is a one-time URL. It means once you follow by created link, the URL will be deleted</li>
+</ol>
 <pre>
 0 - is a one-time URL. It means once you follow by created link, the URL will be deleted,
 1- is a one-day URL. It means the expiration term of such a URL is one day. For example, if you create a URL item today, tomorrow it will be deleted
