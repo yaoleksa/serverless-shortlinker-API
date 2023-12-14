@@ -15,7 +15,7 @@ The **token** you have to put in the request header as an **Authorization** prop
 ## Proper request body and header
 When you post new url item to database you should construct proper body and header of request. As mentioned above it's criticaly important to add headers' *Authorization* in the next format:
 ***
-`{
+<pre>{
     Authorization: Bearer YOUR_TOKEN RETRIEVED AT THE PREVIOUS STEP
-}`
+}</pre>
 ***
