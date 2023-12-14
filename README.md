@@ -48,4 +48,24 @@ If you have done everything properly the response will look something like this:
 ***
 
 ## Get the list of your items
-To get the list of URLs which you created make a GET request with mentioned above header and empty body
+To get the list of URLs which you created make a GET request with mentioned above header and empty body. The valid response should look something like this:
+***
+<pre>{
+  "Items": [
+    {
+      "lastVisit": null,
+      "id": "38Sdi",
+      "url": "https://example.com",
+      "type": "one-time",
+      "visit": 0
+    },
+    {
+      "lastVisit": "12/13/2023, 8:30:45 AM",
+      "id": "pzjxp",
+      "url": "https://youtube.com",
+      "type": "one-day",
+      "visit": 1
+    }
+  ]
+}</pre>
+***
