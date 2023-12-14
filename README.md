@@ -13,7 +13,7 @@ So, if you've done everything properly, now there is a **token**. This token you
 The **token** you have to put in the request header as an **Authorization** property in the following format: Bearer *your_token*
 
 ## Proper request body and header
-When you post new url item to database you should construct proper body and header of request. As mentioned above it's criticaly important to add headers' *Authorization* in the next format:
+When you post a new url item to the database you should construct the proper body and header of the request. As mentioned above it's critically important to add headers' Authorization in the next format:
 ***
 <pre>{
     Authorization: Bearer YOUR_TOKEN RETRIEVED AT THE PREVIOUS STEP
