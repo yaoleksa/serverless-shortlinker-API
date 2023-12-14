@@ -26,10 +26,7 @@ The Body of a POST request should have the following format:
     "type":"ONE OF THE ALLOWED TYPES"
 }</pre>
 ***
-***
-[!WARNING]
-There is a url validator, url must start from `http://` or `https://` prefix and has at leaest one character
-***
+> :warning: **There is a url validator, url must start from `http://` or `https://` prefix and has at leaest one character**
 The response will look something like this:
 ***
 <pre>{
