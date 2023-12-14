@@ -139,11 +139,6 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
         while(all.Items.find(e => e.id == recordId)) {
           recordId = uid.rnd();
         }
-        if(!types[event.body.type]) {
-          return formatJSONResponse({ 
-            message: 'Invalid link type' 
-          }, null, 403);
-        }
         if(!validateUrl(event.body.url)) {
           return formatJSONResponse({
             message: 'Invalid url format'
@@ -164,7 +159,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               }
             })
           );
-        } else if(event.body.type != '0') {
+        } else if(event.body.type == '1') {
           await dynamo.send(
             new PutCommand({
               TableName: tableName,
@@ -175,10 +170,40 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
                 visit: 0,
                 lastVisit: null,
                 email: event.requestContext.authorizer.claims.email,
-                expirationDate: Math.floor((new Date().getTime() + 5 * 60 * 1000)/1000)
+                expirationDate: Math.floor((new Date().getTime() + 3600 * 24000)/1000)
               }
             })
           );
+        } else if(event.body.type == '2') {
+          await dynamo.send(new PutCommand({
+            TableName: tableName,
+            Item: {
+              id: recordId,
+              url: event.body.url,
+              type: types[event.body.type],
+              visit: 0,
+              lastVisit: null,
+              email: event.requestContext.authorizer.claims.email,
+              expirationDate: Math.floor((new Date().getTime() + 3 * 3600 * 24000)/1000)
+            }
+          }));
+        } else if(event.body.type == '3') {
+          await dynamo.send(new PutCommand({
+            TableName: tableName,
+            Item: {
+              id: recordId,
+              url: event.body.url,
+              type: types[event.body.type],
+              visit: 0,
+              lastVisit: null,
+              email: event.requestContext.authorizer.claims.email,
+              expirationDate: Math.floor((new Date().getTime() + 7 * 3600 * 24000)/1000)
+            }
+          }));
+        } else {
+          return formatJSONResponse({
+            message: 'Invalid link type'
+          }, null, 403); 
         }
         return formatJSONResponse({
           message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId,
