@@ -144,7 +144,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
             message: 'Invalid url format'
           }, null, 403);
         }
-        if(event.body.type == '0') {
+        if(event.body.type === '0') {
           await dynamo.send(
             new PutCommand({
               TableName: tableName,
@@ -159,7 +159,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               }
             })
           );
-        } else if(event.body.type == '1') {
+        } else if(event.body.type === '1') {
           await dynamo.send(
             new PutCommand({
               TableName: tableName,
@@ -174,7 +174,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               }
             })
           );
-        } else if(event.body.type == '2') {
+        } else if(event.body.type === '2') {
           await dynamo.send(new PutCommand({
             TableName: tableName,
             Item: {
@@ -187,7 +187,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               expirationDate: Math.floor((new Date().getTime() + 3 * 3600 * 24000)/1000)
             }
           }));
-        } else if(event.body.type == '3') {
+        } else if(event.body.type === '3') {
           await dynamo.send(new PutCommand({
             TableName: tableName,
             Item: {
