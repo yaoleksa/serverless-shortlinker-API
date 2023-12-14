@@ -46,3 +46,6 @@ If you have done everything properly the response will look something like this:
   "message": "https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/mkm5o"
 }</pre>
 ***
+
+## Get the list of your items
+To get the list of URLs which you created make a GET request with mentioned above header and empty body
