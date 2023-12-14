@@ -11,3 +11,11 @@ So, if you've done everything properly, now there is a **token**. This token you
 - DELETE - https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/{id}
 
 The **token** you have to put in the request header as an **Authorization** property in the following format: Bearer *your_token*
+
+## Proper request body and header
+When you post new url item to database you should construct proper body and header of request. As mentioned above it's criticaly important to add headers' *Authorization* in the next format:
+***
+{
+    Authorization: Bearer YOUR_TOKEN RETRIEVED AT PROVIOUS STEP
+}
+***
