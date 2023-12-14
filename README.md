@@ -30,7 +30,7 @@ The Body of a POST request should have the following format:
 }</pre>
 ***
 
-> :warning: **There is a url validator, url must start from `http://` or `https://` prefix and has at leaest one character**
+> :warning: **There is a url validator, url must start from `http://` or `https://` prefix and has at least one character**
 
 The response will look something like this:
 
