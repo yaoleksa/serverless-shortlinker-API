@@ -16,6 +16,7 @@ import axios from 'axios';
 import schema from './schema';
 import authSchema from './authSchema';
 import { types, validateUrl } from './validator';
+import sender from './sendingEmail';
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -144,6 +145,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
             message: 'Invalid url format'
           }, null, 403);
         }
+        let notifactionStatus;
         if(event.body.type === '0') {
           await dynamo.send(
             new PutCommand({
@@ -159,6 +161,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               }
             })
           );
+          notifactionStatus = await sender(event.requestContext.authorizer.claims.email, null);
         } else if(event.body.type === '1') {
           await dynamo.send(
             new PutCommand({
@@ -174,6 +177,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               }
             })
           );
+          notifactionStatus = await sender(event.requestContext.authorizer.claims.email, new Date().getTime() + 3600 * 24000);
         } else if(event.body.type === '2') {
           await dynamo.send(new PutCommand({
             TableName: tableName,
@@ -187,6 +191,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               expirationDate: Math.floor((new Date().getTime() + 3 * 3600 * 24000)/1000)
             }
           }));
+          notifactionStatus = await sender(event.requestContext.authorizer.claims.email, new Date().getTime() + 3 * 3600 * 24000);
         } else if(event.body.type === '3') {
           await dynamo.send(new PutCommand({
             TableName: tableName,
@@ -200,6 +205,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
               expirationDate: Math.floor((new Date().getTime() + 7 * 3600 * 24000)/1000)
             }
           }));
+          notifactionStatus = await sender(event.requestContext.authorizer.claims.email, new Date().getTime() + 7 * 3600 * 24000);
         } else {
           return formatJSONResponse({
             message: 'Invalid link type'
@@ -207,6 +213,7 @@ ValidatedEventAPIGatewayAuthorizerEvent<typeof schema | typeof authSchema> = asy
         }
         return formatJSONResponse({
           message: event.headers['CloudFront-Forwarded-Proto'] + '://' + event.headers.Host + contextPath + recordId,
+          status: notifactionStatus ? notifactionStatus : 'mail was not sent'
         }, null, 201);
     } catch(error) {
       return formatJSONResponse({
