@@ -16,7 +16,7 @@ export default async function sender(recipient: string, term: number): Promise<S
                     Body: {
                         Text: {
                             Charset: 'UTF-8',
-                            Data: 'Your URL item will be deleted soon'
+                            Data: 'Your URL item has been deleted'
                         }
                     },
                     Subject: {
