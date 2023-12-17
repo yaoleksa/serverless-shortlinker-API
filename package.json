@@ -27,6 +27,7 @@
     "esbuild": "^0.14.11",
     "json-schema-to-ts": "^1.5.0",
     "jsonwebtoken": "^9.0.2",
+    "node-schedule": "^2.1.1",
     "serverless": "^3.0.0",
     "serverless-esbuild": "^1.23.3",
     "short-unique-id": "^5.0.3",
