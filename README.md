@@ -43,7 +43,13 @@ If you have done everything properly the response will look something like this:
 
 ***
 <pre>{
-  "message": "https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/mkm5o"
+  "message": "https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/Smuji",
+  "status": {
+    "ResponseMetadata": {
+      "RequestId": "8d5d59fd-62cd-4a58-9dc1-e5e5c6abbfb7"
+    },
+    "MessageId": "0100018c7c26c6db-80d46dc4-41b3-4cff-9fbc-5df6608964a9-000000"
+  }
 }</pre>
 ***
 
