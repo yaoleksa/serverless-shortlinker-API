@@ -75,3 +75,24 @@ To get the list of URLs which you created make a GET request with mentioned abov
   ]
 }</pre>
 ***
+
+## Delete item
+If you wanna delete an item you should make an API call to the above-mentioned endpoint with the above-mentioned header
+#### Example
+Request:
+
+***
+<pre>curl -X DELETE https://ivznyk9rp2.execute-api.us-east-1.amazonaws.com/dev/cDdQr -H "Authorization: Bearer eyJraWQiOiJMUExyalwvOXA2b3VsKzRjQnRKcXJVVmM2czlFbmhOTjFHcTFxWTBoeFRKbz0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoiVHFIS05iZUM4Zzd1STF6amJPREtKQSIsInN1YiI6IjRhNjkwNWUzLWYxZWMtNDljMC05ZDdiLTFmOTIzMzE5MTlmOSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV8yR0xnakdReDIiLCJjb2duaXRvOnVzZXJuYW1lIjoiNGE2OTA1ZTMtZjFlYy00OWMwLTlkN2ItMWY5MjMzMTkxOWY5Iiwib3JpZ2luX2p0aSI6ImFiNDc2NjNjLTg3M2UtNGIyNC1hM2E2LTc4ZGFjZTQ2NDE0MSIsImF1ZCI6IjQzMmY3cWsxNDVyZjBoYTV1NTYwNW9icHFmIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE3MDI4OTQ5MDQsImV4cCI6MTcwMjg5ODUwNCwiaWF0IjoxNzAyODk0OTA0LCJqdGkiOiJmZTFmMGJkYy1hZjQ0LTRhYWQtYTE5MC1mNTQxYjlmYzliOTIiLCJlbWFpbCI6ImNoZWNrZXJmZnNAZ21haWwuY29tIn0.KAImSoG-RDDr5p4xdbJej-FI44zq7MG-FDoj8S9R_ByE_hzj1RHCITFhct8rvbucxB_4jt9QL9uA2m1NatRlQS8gwdnse_r25QatvNPf1lPLOj2paZjEdypnihZESWh-TminAmRbY5d-f7Q3lq7iInjoz55foxGfMF6Di8zxIWZe6He_5ODB5EsfWSeGHBiXdTcXMJDl73CCtMkJH-gNQTxd7fce1qqNnVL-iDc06Y-8RPXf38U8GsrGCOffpYwi__tXDbzLxqE2U2D8rAMKiCMWx16x0XFSa4eo8eHRQJ0FgIoaONRuiOGzRr__Cr8NgN1U15lcK6FQNJoPJskdxw"</pre>
+***
+
+Response:
+***
+<pre>{
+  "$metadata": {
+    "httpStatusCode":200,
+    "requestId":"B0MQVRO1F2RPIHOJDTV2VN37VVVV4KQNSO5AEMVJF66Q9ASUAAJG",
+    "attempts":2,
+    "totalRetryDelay":89
+  }
+}</pre>
+***
